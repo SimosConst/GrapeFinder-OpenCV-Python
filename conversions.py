@@ -62,3 +62,75 @@ def CfCann(img, a, b, c, d):
     img2 = CircleFinder(img2, d)
 
     return img2
+
+
+def findContours(img, a, b):
+    img2 = img.copy()
+    # converting image into grayscale image
+    gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # setting threshold of gray image
+    _, threshold = cv2.threshold(gray, a, 255, cv2.THRESH_BINARY)
+
+    # using a findContours() function
+    contours, _ = cv2.findContours(
+        threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    i = 0
+
+    # list for storing names of shapes
+    for contour in contours:
+
+        # here we are ignoring first counter because
+        # findcontour function detects whole image as shape
+        if i == 0:
+            i = 1
+            continue
+
+        # cv2.approxPloyDP() function to approximate the shape
+        approx = cv2.approxPolyDP(
+            contour, 0.01 * cv2.arcLength(contour, True), True)
+
+        # using drawContours() function
+        cv2.drawContours(img2, [contour], 0, (0, 0, 255), 5)
+
+        # # finding center point of shape
+        # M = cv2.moments(contour)
+        # x = 0
+        # y = 0
+        # if M['m00'] != 0.0:
+        #     x = int(M['m10'] / M['m00'])
+        #     y = int(M['m01'] / M['m00'])
+
+        # # putting shape name at center of each shape
+        # if len(approx) == 3:
+        #     cv2.putText(img2, 'Triangle', (x, y),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        #
+        # elif len(approx) == 4:
+        #     cv2.putText(img2, 'Quadrilateral', (x, y),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        #
+        # elif len(approx) == 5:
+        #     cv2.putText(img2, 'Pentagon', (x, y),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        #
+        # elif len(approx) == 6:
+        #     cv2.putText(img2, 'Hexagon', (x, y),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        #
+        # else:
+        #     cv2.putText(img2, 'circle', (x, y),
+        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+    return img2
+
+
+def isolateClolor(img, lowerbound, upperbound):
+    img2 = img.copy()
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(img2, lowerbound, upperbound)
+    mask_rgb = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+    img2 = cv2.bitwise_and(img2 , mask_rgb)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_HSV2BGR)
+    return img2

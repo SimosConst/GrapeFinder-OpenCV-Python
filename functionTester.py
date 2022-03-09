@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+
 import conversions as conv
 
 
@@ -9,7 +10,7 @@ def nothing(x):
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
-img = cv2.imread("../Grapes/grape2.jpeg")
+img = cv2.imread("../Grapes/grape1.jpeg")
 cv2.imshow('arxikh', img)
 
 cv2.namedWindow('controls')
@@ -44,10 +45,15 @@ while (1):
     # else:
     #     img[:] = [b,g,r]
 
-    # img2 =conv.CannyMask(img, r, g)
+    # img2 =conv.CannyMask(img, r, g, b)
     # img2= conv.CircleFinder(img, r)
-    img2 = conv.CfCann(img, r, g, b1, b)
-    cv2.imshow('image', img2)
+    # img2 = conv.CfCann(img, r, g, b1, b)
 
+    # img2 = conv.findContours(img, r, g)
+
+    img2 = conv.isolateClolor(img, np.array((0, r, 0), dtype="uint8"), np.array((255, g, 255), dtype="uint8"))
+
+
+    cv2.imshow('image', img2)
 
 cv2.destroyAllWindows()
