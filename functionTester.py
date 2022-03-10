@@ -16,7 +16,7 @@ cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
 
 cv2.namedWindow('controls', cv2.WINDOW_NORMAL)
 cv2.namedWindow('image')
-
+# test
 # create trackbars for color change
 cv2.createTrackbar('R', 'controls', 200, 600, nothing)
 cv2.createTrackbar('G', 'controls', 400, 600, nothing)
