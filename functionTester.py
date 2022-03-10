@@ -10,7 +10,7 @@ def nothing(x):
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
-img = cv2.imread("../Grapes/grape4.jpeg")
+img = cv2.imread("grapes/grape4.jpeg")
 cv2.imshow('arxikh', func.resizeImg(img, 2))
 
 cv2.namedWindow('controls')
