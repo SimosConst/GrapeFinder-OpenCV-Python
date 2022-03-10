@@ -126,11 +126,11 @@ def findContours(img, a, b):
     return img2
 
 
-def isolateClolor(img, lowerbound, upperbound):
-    img2 = img.copy()
-    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+def isolateColor(img, lowerbound, upperbound):
+    # img2 = img.copy()
+    img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(img2, lowerbound, upperbound)
     mask_rgb = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    img2 = cv2.bitwise_and(img2 , mask_rgb)
+    img2 = cv2.bitwise_and(img2, mask_rgb)
     img2 = cv2.cvtColor(img2, cv2.COLOR_HSV2BGR)
     return img2
