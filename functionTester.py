@@ -10,7 +10,8 @@ def nothing(x):
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
-img = cv2.imread("grapes/grape1.jpeg")
+img = cv2.imread("grapes/grape2.jpeg")
+print(img)
 cv2.imshow('arxikh', func.resizeImg(img, 2))
 
 cv2.namedWindow('controls')
@@ -40,10 +41,6 @@ while (1):
     b1 = cv2.getTrackbarPos('B1', 'controls')
     # s = cv2.getTrackbarPos(switch,'controls')
 
-    # if s == 0:
-    #     img[:] = 0
-    # else:
-    #     img[:] = [b,g,r]
 
     # img2 =conv.CannyMask(img, r, g, b)
     # img2= conv.CircleFinder(img, r)
