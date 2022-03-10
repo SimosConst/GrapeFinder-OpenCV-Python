@@ -36,7 +36,6 @@ def showim(img):
 
     cv2.destroyAllWindows()
 
-
 # --------------------------
 # IMAGE RESIZE
 # --------------------------
@@ -68,6 +67,7 @@ def s_hsv2grb(h):
 
 
 def hsv2grb(h, s, v):
+
     # CONVERSIONS
     h = h / 360
     s = s / 100
@@ -79,6 +79,7 @@ def hsv2grb(h, s, v):
     rgb_truple = rgb_truple[2], rgb_truple[1], rgb_truple[0]
 
     return rgb_truple
+
 
 
 # --------------------------

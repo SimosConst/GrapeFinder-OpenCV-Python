@@ -1,9 +1,8 @@
 import cv2
 import numpy as np
 
-import conversions as conv
 import Functions as func
-
+import conversions as conv
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
@@ -37,7 +36,6 @@ while (1):
     b = cv2.getTrackbarPos('B', 'controls')
     b1 = cv2.getTrackbarPos('B1', 'controls')
     # s = cv2.getTrackbarPos(switch,'controls')
-
 
     # img2 =conv.CannyMask(img, r, g, b)
     # img2= conv.CircleFinder(img, r)
