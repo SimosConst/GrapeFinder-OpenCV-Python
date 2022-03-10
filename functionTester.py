@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 import conversions as conv
-
+import Functions as func
 
 def nothing(x):
     pass
@@ -10,8 +10,8 @@ def nothing(x):
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
-img = cv2.imread("../Grapes/grape1.jpeg")
-cv2.imshow('arxikh', img)
+img = cv2.imread("../Grapes/grape4.jpeg")
+cv2.imshow('arxikh', func.resizeImg(img, 2))
 
 cv2.namedWindow('controls')
 cv2.namedWindow('image')
@@ -20,7 +20,7 @@ cv2.namedWindow('image')
 cv2.createTrackbar('R', 'controls', 200, 600, nothing)
 cv2.createTrackbar('G', 'controls', 400, 600, nothing)
 cv2.createTrackbar('B', 'controls', 9, 100, nothing)
-cv2.createTrackbar('B2', 'controls', 3, 50, nothing)
+cv2.createTrackbar('B1', 'controls', 3, 50, nothing)
 cv2.imshow('controls', np.ones((10, 800), np.uint8))
 
 # create switch for ON/OFF functionality
@@ -37,7 +37,7 @@ while (1):
     r = cv2.getTrackbarPos('R', 'controls')
     g = cv2.getTrackbarPos('G', 'controls')
     b = cv2.getTrackbarPos('B', 'controls')
-    b1 = cv2.getTrackbarPos('B2', 'controls')
+    b1 = cv2.getTrackbarPos('B1', 'controls')
     # s = cv2.getTrackbarPos(switch,'controls')
 
     # if s == 0:
@@ -51,9 +51,8 @@ while (1):
 
     # img2 = conv.findContours(img, r, g)
 
-    img2 = conv.isolateClolor(img, np.array((0, r, 0), dtype="uint8"), np.array((255, g, 255), dtype="uint8"))
+    img2 = conv.isolateColor(img, np.array((r, b, b1), dtype="uint8"), np.array((g, 255, 255), dtype="uint8"))
 
-
-    cv2.imshow('image', img2)
+    cv2.imshow('image', func.resizeImg(img2, 2))
 
 cv2.destroyAllWindows()
