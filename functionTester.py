@@ -4,9 +4,6 @@ import numpy as np
 import conversions as conv
 import Functions as func
 
-def nothing(x):
-    pass
-
 
 # Create a black image, a window
 # img = np.zeros((300,512,3), np.uint8)
@@ -18,15 +15,15 @@ cv2.namedWindow('controls', cv2.WINDOW_NORMAL)
 cv2.namedWindow('image')
 
 # create trackbars for color change
-cv2.createTrackbar('R', 'controls', 200, 600, nothing)
-cv2.createTrackbar('G', 'controls', 400, 600, nothing)
-cv2.createTrackbar('B', 'controls', 9, 100, nothing)
-cv2.createTrackbar('B1', 'controls', 3, 50, nothing)
+cv2.createTrackbar('R', 'controls', 200, 600, func.nothing)
+cv2.createTrackbar('G', 'controls', 400, 600, func.nothing)
+cv2.createTrackbar('B', 'controls', 9, 100, func.nothing)
+cv2.createTrackbar('B1', 'controls', 3, 50, func.nothing)
 cv2.imshow('controls', np.ones((1, 800), np.uint8))
 
 # create switch for ON/OFF functionality
 # switch = '0 : OFF \n1 : ON'
-# cv2.createTrackbar(switch, 'controls',0,1,nothing)
+# cv2.createTrackbar(switch, 'controls',0,1,func.nothing)
 
 while (1):
 
