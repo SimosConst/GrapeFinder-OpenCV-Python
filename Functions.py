@@ -44,7 +44,7 @@ def resizeImg(img, multiplyer):
     w = w * multiplyer
     h = h * multiplyer
 
-    img2 = cv2.resize(img, (w, h), interpolation=cv2.INTER_NEAREST_EXACT)
+    img2 = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
 
     return img2
 
