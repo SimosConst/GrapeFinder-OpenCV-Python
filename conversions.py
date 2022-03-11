@@ -2,15 +2,33 @@ import cv2
 import numpy as np
 
 
+def sobelViewer(img, kernel_size):
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+    grad_x = cv2.Sobel(img, cv2.CV_16S, 1, 0, ksize=kernel_size)
+    grad_y = cv2.Sobel(img, cv2.CV_16S, 0, 1, ksize=kernel_size)
+
+    abs_grad_x = cv2.convertScaleAbs(grad_x)
+    abs_grad_y = cv2.convertScaleAbs(grad_y)
+    grad = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
+
+    return [abs_grad_x, abs_grad_y, grad]
+
+
+# --------------------------------
+# CONTOURS
+# --------------------------------
+
 def CannyConv(img, a, b):
     img2 = cv2.Canny(img, a, b)
 
     return img2
 
 
-def CannyMask(img, a, b, c):
+def CannyMask(img, thresh1, thresh2, dialateSize):
     # GET CONTOURS
-    img2 = CannyConv(img, a, b)
+    img2 = CannyConv(img, thresh1, thresh2)
     # Enlarge Contours
     # img2  = cv2.dilate(img2,np.ones((5, 5), np.uint8))
     # BACK TO RGB FOR THE MASKING
@@ -18,18 +36,22 @@ def CannyMask(img, a, b, c):
     # MASKING
     # img2 = cv2.bitwise_and(img, img2)
     # Enlarge Contours
-    img2 = cv2.dilate(img2, np.ones((c, c), np.uint8))
+    img2 = cv2.dilate(img2, np.ones((dialateSize, dialateSize), np.uint8))
     # MEDIAN BlUR
     # img2 = cv2.medianBlur(img2, 5)
 
     return img2
 
 
-def CircleFinder(img, a1):
+# --------------------------------
+# FINDING CIRCLES
+# --------------------------------
+
+def CircleFinder(img, blurSize):
     # img2 = img.copy()
 
     # Blur using 3 * 3 kernel.
-    blurred = cv2.blur(img, (a1, a1))
+    blurred = cv2.blur(img, (blurSize, blurSize))
 
     # Convert to grayscale.
     gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
@@ -57,14 +79,18 @@ def CircleFinder(img, a1):
     return blurred
 
 
-def CfCann(img, a, b, c, d):
-    img2 = CannyMask(img, a, b, c)
-    img2 = CircleFinder(img2, d)
+# FUNCTIONS ENSEMBLE
+
+def CfCann(img, thresh1, thresh2, dialateSize, blurSize):
+    img2 = CannyMask(img, thresh1, thresh2, dialateSize)
+    img2 = CircleFinder(img2, blurSize)
 
     return img2
 
 
-def findContours(img, a, b):
+# USING CONTOURS FUNCTION
+
+def findContours(img, a):
     img2 = img.copy()
     # converting image into grayscale image
     gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -126,11 +152,50 @@ def findContours(img, a, b):
     return img2
 
 
-def isolateColor(img, lowerbound, upperbound):
+# --------------------------------
+# COLOR ISOLATION
+# --------------------------------
+
+def isolateColor(img, lowerbound, upperbound, medBlurAmount):
     # img2 = img.copy()
     img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(img2, lowerbound, upperbound)
     mask_rgb = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     img2 = cv2.bitwise_and(img2, mask_rgb)
+
+    img2 = cv2.medianBlur(img2, ksize=medBlurAmount)
     img2 = cv2.cvtColor(img2, cv2.COLOR_HSV2BGR)
     return img2
+
+
+def brightestSpot(img, a):
+    if (not (a % 2)):
+        a += 1
+    img2 = img.copy()
+    gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # apply a Gaussian blur to the image then find the brightest region
+    gray = cv2.GaussianBlur(gray, (a, a), 0)
+    (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
+
+    gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    img2 = cv2.circle(gray, maxLoc, 5, (255, 225, 230), 2)
+
+    return img2
+
+
+def kMeans(img, K):
+    Z = img.reshape((-1, 3))
+    # convert to np.float32
+    Z = np.float32(Z)
+    # define criteria, number of clusters(K) and apply kmeans()
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 5.0)
+
+    ret, label, center = cv2.kmeans(Z, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    print(ret)
+    # Now convert back into uint8, and make original image
+    center = np.uint8(center)
+    res = center[label.flatten()]
+    res2 = res.reshape((img.shape))
+
+    return res2

@@ -9,7 +9,14 @@ class slidersWindow:
         "HueLow",
         "HueHigh",
         "SatLow",
-        "SatHigh"
+        "SatHigh",
+
+        "CannThresh1",
+        "CannThresh2",
+
+        "DialateSz",
+        "BlurSz",
+        "SobelKSize"
     ]
 
     def __init__(self):
@@ -17,6 +24,10 @@ class slidersWindow:
 
     def nothing(self, x):
         pass
+
+    def odds(self, x):
+        if x % 2 == 0:
+            x = 1
 
     def initSliders(self):
         cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)
@@ -26,6 +37,12 @@ class slidersWindow:
         cv2.createTrackbar(self.sliderNames[1], self.name, 255, 255, self.nothing)
         cv2.createTrackbar(self.sliderNames[2], self.name, 0, 255, self.nothing)
         cv2.createTrackbar(self.sliderNames[3], self.name, 255, 255, self.nothing)
+
+        cv2.createTrackbar(self.sliderNames[4], self.name, 100, 400, self.nothing)
+        cv2.createTrackbar(self.sliderNames[5], self.name, 300, 400, self.nothing)
+        cv2.createTrackbar(self.sliderNames[6], self.name, 2, 20, self.nothing)
+        cv2.createTrackbar(self.sliderNames[7], self.name, 1, 10, self.nothing)
+        cv2.createTrackbar(self.sliderNames[8], self.name, 1, 31, self.nothing)
 
     def showWindow(self):
         cv2.imshow(self.name, np.ones((1, 100), np.uint8))
@@ -38,6 +55,12 @@ class slidersWindow:
             value = cv2.getTrackbarPos(sliderName, self.name)
             values.append(value)
         return values
+
+    def getSliderValuesByName(self, reqName):
+        for name in self.sliderNames:
+            if reqName == name:
+                return cv2.getTrackbarPos(name, self.name)
+
 
 # TESTING
 # w1 = slidersWindow()

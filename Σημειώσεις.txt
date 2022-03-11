@@ -1,0 +1,14 @@
+
+
+--NOT WORKING CORRECTLY--
+COLOR ISOLATION >
+    CANNY CONTOUR FINDER >
+        DIALATE CONTOURS >
+            CIRCLE FINDER
+
+Depth estimation?
+
+Posterize Effect with Kmeans
+
+Grape Berry identifier from shperical shape?
+    With Grayscale
