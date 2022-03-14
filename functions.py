@@ -1,7 +1,9 @@
 import colorsys
+import time
 
 import cv2
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 def nothing(x):
@@ -22,6 +24,21 @@ def subpltshow(im1, im2):
     # plt.subplot(, plt.title("Title1")
 
 
+def showImgs(imgs):
+    # time.sleep(.5)
+    for i in range(len(imgs)):
+        img = imgs[i]
+        img = resizeImg(img, 2)
+        cv2.imshow("Image" + str(i), img)
+
+    for i in range(len(imgs), 10):
+        # Find if Window exists to close it
+        cond = cv2.getWindowProperty("Image" + str(i), cv2.WND_PROP_VISIBLE)
+        if (cond):
+            cv2.destroyWindow("Image" + str(i))
+
+
+# NOT GOOD
 def showim(img):
     cv2.namedWindow("Window_1", cv2.WINDOW_NORMAL)
     cv2.createTrackbar("Trackbar_1", "Window_1", 0, 255, nothing)
@@ -35,6 +52,7 @@ def showim(img):
         cv2.imshow("Window_1", img)
 
     cv2.destroyAllWindows()
+
 
 # --------------------------
 # IMAGE RESIZE
@@ -67,7 +85,6 @@ def s_hsv2grb(h):
 
 
 def hsv2grb(h, s, v):
-
     # CONVERSIONS
     h = h / 360
     s = s / 100
@@ -81,7 +98,30 @@ def hsv2grb(h, s, v):
     return rgb_truple
 
 
+def bgr2hsv255(bgr):
+    bgr = np.array(bgr, dtype=np.float32)
+    bgr /= 255
+    # print(bgr)
+    # print(np.flip(bgr))
+    h, s, v = colorsys.rgb_to_hsv(bgr[2], bgr[1], bgr[0])
+    # print(h,s,v)
+    hsv255 = np.array([h, s, v], dtype=np.float32)
+    hsv255 *= 255
+    # print(hsv255)
+    return hsv255
 
+
+def hue255FromBGR(bgr):
+    bgr = np.array(bgr, dtype=np.float32)
+    bgr /= 255
+    # print(bgr)
+    # print(np.flip(bgr))
+    h, _, _ = colorsys.rgb_to_hsv(bgr[2], bgr[1], bgr[0])
+    h *= 255
+    return h
+
+
+# bgr2hsv255([255,255,255])
 # --------------------------
 # UI
 # --------------------------

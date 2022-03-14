@@ -12,3 +12,15 @@ Posterize Effect with Kmeans
 
 Grape Berry identifier from shperical shape?
     With Grayscale
+
+_____________________________
+
+-Dominant Colors Finder(!!COMPLETED!!)
+    Βρίσκουμε τα κύρια χρώματα
+
+- Απομονώνουμε κάθε εικόνα για κάθε χρώμα
+
+- Αναγνώριση Σταφυλιού
+
+
+

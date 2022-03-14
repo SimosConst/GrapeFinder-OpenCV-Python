@@ -35,14 +35,14 @@ class slidersWindow:
         # create trackbars for color change
         cv2.createTrackbar(self.sliderNames[0], self.name, 0, 255, self.nothing)
         cv2.createTrackbar(self.sliderNames[1], self.name, 255, 255, self.nothing)
-        cv2.createTrackbar(self.sliderNames[2], self.name, 0, 255, self.nothing)
+        cv2.createTrackbar(self.sliderNames[2], self.name, 1, 255, self.nothing)
         cv2.createTrackbar(self.sliderNames[3], self.name, 255, 255, self.nothing)
 
         cv2.createTrackbar(self.sliderNames[4], self.name, 100, 400, self.nothing)
         cv2.createTrackbar(self.sliderNames[5], self.name, 300, 400, self.nothing)
-        cv2.createTrackbar(self.sliderNames[6], self.name, 2, 20, self.nothing)
-        cv2.createTrackbar(self.sliderNames[7], self.name, 1, 10, self.nothing)
-        cv2.createTrackbar(self.sliderNames[8], self.name, 1, 31, self.nothing)
+        cv2.createTrackbar(self.sliderNames[6], self.name, 2, 200, self.nothing)
+        cv2.createTrackbar(self.sliderNames[7], self.name, 5, 100, self.nothing)
+        cv2.createTrackbar(self.sliderNames[8], self.name, 1, 310, self.nothing)
 
     def showWindow(self):
         cv2.imshow(self.name, np.ones((1, 100), np.uint8))
