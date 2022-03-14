@@ -1,9 +1,11 @@
+import math
 from builtins import len
 
 import cv2
 import numpy as np
 import time
 import functions as func
+from collections import Counter as ct
 
 
 def sobelViewer(img, kernel_size):
@@ -51,15 +53,15 @@ def filter2d(img, kernel):
 # CONTOURS
 # --------------------------------
 
-def CannyConv(img, a, b):
+def cannyConv(img, a, b):
     img2 = cv2.Canny(img, a, b)
 
     return img2
 
 
-def CannyMask(img, thresh1, thresh2, dialateSize):
+def cannyMask(img, thresh1, thresh2, dialateSize):
     # GET CONTOURS
-    img2 = CannyConv(img, thresh1, thresh2)
+    img2 = cannyConv(img, thresh1, thresh2)
     # Enlarge Contours
     # img2  = cv2.dilate(img2,np.ones((5, 5), np.uint8))
     # BACK TO RGB FOR THE MASKING
@@ -87,21 +89,50 @@ def circle_finder(img):
 
     # Apply Hough transform on the blurred image.
     detected_circles = cv2.HoughCircles(gray,
-                                        cv2.HOUGH_GRADIENT, 1.5, 20, param1=5,
-                                        param2=48, minRadius=1, maxRadius=25)
+                                        cv2.HOUGH_GRADIENT, 1.5, 20, param1=10,
+                                        param2=32, minRadius=1, maxRadius=25)
 
     # Draw circles that are detected.
     if detected_circles is not None:
 
         # Convert the circle parameters a, b and r to integers.
         detected_circles = np.uint16(np.around(detected_circles))
+        # CONVERSIONS FOR LATER MANIPUATION
+        circles = detected_circles[0, :]
+        circle_radiuses = [sublist[2] for sublist in circles ]
+        circles = [sublist.tolist() for sublist in circles]
 
-        # print(detected_circles)
-        for pt in detected_circles[0, :]:
+        # Calculate the percentage of circles from which the most common ones will be drawn
+        counter = ct(circle_radiuses)
+        percentage = 4.3
+        fraction = math.floor(percentage * len(circle_radiuses) / 100)
+        # IF FRACTION IS 0 THEN MAKE IT 1
+        if fraction == 0:
+            fraction = 1
+        # FIND MOST COMMON CIRCLE RADIUSES ACCORDING TO A FRACTION
+        most_comm = np.asarray(counter.most_common(fraction))[:, 0]
+        print(
+            # len(counter),
+            # counter,
+            fraction,
+            most_comm
+        )
+        sel_circles = []
+        # FIND AND LIST THE MOST COMMON RADIUSES ACCORDING TO THE INITIAL LIST FOUND
+        for i in range(len(most_comm)):
+            circl_radius = most_comm[i]
+            for j in range(len(circles)):
+                if circl_radius == circle_radiuses[j]:
+                    # print(circles[j], circle_radiuses[j])
+                    sel_circles.append(circles[j])
+        # print(sel_circles)
+        # time.sleep(.3)
+        # sel_circles = circles
+        for pt in sel_circles:
             a, b, r = pt[0], pt[1], pt[2]
 
             # Draw the circumference of the circle.
-            cv2.circle(img, (a, b), r, (180, 190, 180), 2)
+            cv2.circle(img, (a, b), r, (190, 180, 180), 2)
 
             # Draw a small circle (of radius 1) to show the center.
             cv2.circle(img, (a, b), 1, (180, 180, 190), 3)
@@ -111,8 +142,8 @@ def circle_finder(img):
 
 # FUNCTIONS ENSEMBLE
 
-def CfCann(img, thresh1, thresh2, dialateSize, blurSize):
-    img2 = CannyMask(img, thresh1, thresh2, dialateSize)
+def cfCann(img, thresh1, thresh2, dialateSize, blurSize):
+    img2 = cannyMask(img, thresh1, thresh2, dialateSize)
     img2 = circle_finder(img2, blurSize)
 
     return img2
@@ -233,16 +264,16 @@ def kMeans(img, K):
     return res2
 
 
-def getIsolColImgs(img, quantinizeStep=15, colorMargin=10):
-    #GET HSV IMAGE
+def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
+    # GET HSV IMAGE
     img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    #GET HISTOGRAMM
+    # GET HISTOGRAMM
     histHue = cv2.calcHist([img2], [0], None, [256], [0, 256])
-    #CONVERSIONS FOR MANIPULATION
+    # CONVERSIONS FOR MANIPULATION
     histHue = histHue.tolist()
     histHue = [item for sublist in histHue for item in sublist]
 
-    #SOTRING
+    # SOTRING
     srtd = sorted(range(len(histHue)), reverse=True, key=lambda k: histHue[k])
     max31 = []
     step = quantinizeStep
@@ -261,8 +292,8 @@ def getIsolColImgs(img, quantinizeStep=15, colorMargin=10):
 
         if count == len(max31):
             max31.append(num)
-
-    print("Number of Hues: " + str(len(max31)) + ", " + "Hue Values: " + str(max31))
+    # # ---- ----- ---- ----- ---- ----- ---- ----- DEBUG --- ---- -----
+    # print("Number of Hues: " + str(len(max31)) + ", " + "Hue Values: " + str(max31))
 
     count = 0
     imgs = []
@@ -304,11 +335,12 @@ def approach1(img, colorMargin=15):
     for i in range(len(imgs)):
         img = imgs[i]
         no_circles, img = circle_finder(img)
-        # print(type(noCircles))
+        # print(type(nocircles))
 
         if no_circles is not None:
-            print(len(no_circles[0]), no_circles[0])
-            # if len(no_circles[0]) >= 6:
-            imgs2.append(img)
+            # # ---- ----- ---- ----- ---- ----- ---- ----- DEBUG --- ---- -----
+            # print(len(no_circles[0]), no_circles[0])
+            if len(no_circles[0]) >= 6:
+                imgs2.append(img)
 
     return imgs2

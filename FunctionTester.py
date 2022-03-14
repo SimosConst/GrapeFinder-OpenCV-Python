@@ -9,7 +9,7 @@ import slidersWindow as sldWin
 import conversions as conv
 
 # LOAD IMAGE
-img = cv2.imread("grapes/grape6.jpeg")
+img = cv2.imread("grapes/grape8.jpeg")
 
 # IMAGE MULTIPLYER
 windowSizeMult = 2
@@ -40,7 +40,7 @@ while (1):
     # img2 = conv.findContours(img2, w.getSliderValuesByName("CannThresh2"))
 
 
-    img2 = cv2.bilateralFilter(img, 18, 90, 40)
+    img2 = cv2.bilateralFilter(img, 38, 90, 40)
     # img2 = cv2.medianBlur(img2, 5)
     # cv2.imshow("Filetered", func.resizeImg(img2, windowSizeMult))
 
