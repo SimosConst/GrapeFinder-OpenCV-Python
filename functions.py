@@ -24,11 +24,11 @@ def subpltshow(im1, im2):
     # plt.subplot(, plt.title("Title1")
 
 
-def showImgs(imgs):
+def showImgs(imgs, windowSizeMult=2):
     # time.sleep(.5)
     for i in range(len(imgs)):
         img = imgs[i]
-        img = resizeImg(img, 2)
+        img = resizeImg(img, windowSizeMult)
         cv2.imshow("Image" + str(i), img)
 
     for i in range(len(imgs), 10):
@@ -59,8 +59,8 @@ def showim(img):
 # --------------------------
 def resizeImg(img, multiplyer):
     h, w, _ = img.shape
-    w = w * multiplyer
-    h = h * multiplyer
+    w = int(w * multiplyer)
+    h = int(h * multiplyer)
 
     img2 = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
 

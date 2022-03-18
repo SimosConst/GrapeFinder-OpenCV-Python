@@ -80,7 +80,7 @@ def cannyMask(img, thresh1, thresh2, dialateSize):
 # FINDING CIRCLES
 # --------------------------------
 
-def circle_finder(img):
+def circle_finder(img, cannyParam1=10, cannyParam2=32, minRadius=1, maxRadius=25):
     # # Blur using 3 * 3 kernel.
     # blurred = cv2.blur(img, (blurSize, blurSize))
 
@@ -89,8 +89,8 @@ def circle_finder(img):
 
     # Apply Hough transform on the blurred image.
     detected_circles = cv2.HoughCircles(gray,
-                                        cv2.HOUGH_GRADIENT, 1.5, 20, param1=10,
-                                        param2=32, minRadius=1, maxRadius=25)
+                                        cv2.HOUGH_GRADIENT, 1.5, 20, param1=cannyParam1,
+                                        param2=cannyParam2, minRadius=minRadius, maxRadius=maxRadius)
 
     # Draw circles that are detected.
     if detected_circles is not None:
@@ -99,7 +99,7 @@ def circle_finder(img):
         detected_circles = np.uint16(np.around(detected_circles))
         # CONVERSIONS FOR LATER MANIPUATION
         circles = detected_circles[0, :]
-        circle_radiuses = [sublist[2] for sublist in circles ]
+        circle_radiuses = [sublist[2] for sublist in circles]
         circles = [sublist.tolist() for sublist in circles]
 
         # Calculate the percentage of circles from which the most common ones will be drawn
@@ -329,12 +329,18 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
     return imgs
 
 
-def approach1(img, colorMargin=15):
-    imgs = getIsolColImgs(img, colorMargin=colorMargin)
+def approach1(img, colMarg=15, canPar1=10, canPar2=32, minRad=1, maxRad=25):
+    imgs = getIsolColImgs(img, colorMargin=colMarg)
     imgs2 = []
     for i in range(len(imgs)):
         img = imgs[i]
-        no_circles, img = circle_finder(img)
+        no_circles, img = circle_finder(
+            img,
+            cannyParam1=canPar1,
+            cannyParam2=canPar2,
+            minRadius=minRad,
+            maxRadius=maxRad
+        )
         # print(type(nocircles))
 
         if no_circles is not None:

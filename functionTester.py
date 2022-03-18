@@ -1,6 +1,4 @@
-import heapq
 import time
-
 import cv2
 import matplotlib
 import numpy as np
@@ -8,27 +6,41 @@ import functions as func
 import slidersWindow as sldWin
 import conversions as conv
 
-# LOAD IMAGE
-img = cv2.imread("grapes/grape8.jpeg")
-
 # IMAGE MULTIPLYER
-windowSizeMult = 2
+windowSizeMult = 1.2
 
-# INITIAL IMAGE FRAME
-cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
 
-# CREATE SLIDERWINDOW OBJECT
-w = sldWin.slidersWindow()
+# WRAPPER FUNCTION TO DISPLAY FILTERS FOR EVERY SLIDER CHANGE
+def slidersWindowWrapper(function, image_path):
+    # LOAD IMAGE
+    img = cv2.imread(image_path)
 
-while (1):
-    time.sleep(.1)
-    # BREAK WHEN PRESSING KEY
-    k = cv2.waitKey(1) & 0xFF
-    if k == 27:
-        break
+    # INITIAL IMAGE FRAME
+    cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
 
+    # CREATE SLIDERSWINDOW OBJECT
+    w = sldWin.slidersWindow()
+
+    while (1):
+        # time.sleep(.1)
+        # BREAK WHEN PRESSING KEY
+        k = cv2.waitKey(1) & 0xFF
+        if k == 27:
+            break
+
+        # Call Wrapping Function
+        function(img, w, windowSizeMult)
+
+    cv2.destroyAllWindows()
+
+
+# IMAGE CONVERSIONS/FILTER/CALCULATIONS ENSEBLY
+def functionsTesting(initial_image, slidersWindowObject, windowSizeMult=2):
+    img = initial_image
+    w= slidersWindowObject
+    
     # GET CHANGES FROM SLIDERS
-    v = w.getSliderValues()
+    v = w.getSldVal()
 
     # # ----CONVERSIONS-----
     # # COLOR ISOLATION
@@ -39,13 +51,20 @@ while (1):
     # # CONTOUR FINDER
     # img2 = conv.findContours(img2, w.getSliderValuesByName("CannThresh2"))
 
-
     img2 = cv2.bilateralFilter(img, 38, 90, 40)
-    # img2 = cv2.medianBlur(img2, 5)
+    img2 = cv2.medianBlur(img2, 5)
     # cv2.imshow("Filetered", func.resizeImg(img2, windowSizeMult))
 
-    imgs = conv.approach1(img2, v[7])
-    func.showImgs(imgs)
+    imgs = conv.approach1(
+        img2,
+        colMarg=v[0],
+        canPar1=v[1],
+        canPar2=v[2],
+        minRad=v[3],
+        maxRad=v[4]
+
+    )
+    func.showImgs(imgs, windowSizeMult=windowSizeMult)
 
     # img2 = conv.kMeans(img2, v[2])
 
@@ -62,4 +81,6 @@ while (1):
     # CONVERTED IMAGE FRAME
     # cv2.imshow("Final Image", func.resizeImg(img2, windowSizeMult))
 
-cv2.destroyAllWindows()
+
+# START
+slidersWindowWrapper(functionsTesting, "grapes/grape3.jpeg")
