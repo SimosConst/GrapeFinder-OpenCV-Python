@@ -7,8 +7,7 @@ import slidersWindow as sldWin
 import conversions as conv
 
 # IMAGE MULTIPLYER
-windowSizeMult = 1.2
-
+windowSizeMult = 2.5
 
 # WRAPPER FUNCTION TO DISPLAY FILTERS FOR EVERY SLIDER CHANGE
 def slidersWindowWrapper(function, image_path):
@@ -16,7 +15,8 @@ def slidersWindowWrapper(function, image_path):
     img = cv2.imread(image_path)
 
     # INITIAL IMAGE FRAME
-    cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
+    # cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
+    func.showImg(img,"arxikh",windowSizeMult=windowSizeMult)
 
     # CREATE SLIDERSWINDOW OBJECT
     w = sldWin.slidersWindow()
@@ -64,6 +64,7 @@ def functionsTesting(initial_image, slidersWindowObject, windowSizeMult=2):
         maxRad=v[4]
 
     )
+    func.calcImgs(imgs, conv.findContours, v[9])
     func.showImgs(imgs, windowSizeMult=windowSizeMult)
 
     # img2 = conv.kMeans(img2, v[2])
@@ -81,6 +82,29 @@ def functionsTesting(initial_image, slidersWindowObject, windowSizeMult=2):
     # CONVERTED IMAGE FRAME
     # cv2.imshow("Final Image", func.resizeImg(img2, windowSizeMult))
 
+def simpleTesting(img, slidersWindowObject, windowSizeMult):
+    # GET CHANGES FROM SLIDERS
+    w = slidersWindowObject
+    # v = slidersWindowObject.getSldVal()
+    # w.removeAllTrackbars()
+    params = [
+        "ThrshLow",
+        "ThrshHigh"
+    ]
+    # v=[]
+    v = w.getSldValuesByNames(params)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, v[0],v[1], cv2.THRESH_BINARY_INV)
+    contours,_= cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    img1 = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+    img2 = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+    imgs = [img1,img2]
+    func.calcImgs(imgs, cv2.medianBlur, 3)
+    img = conv.findContours(img, v[0])
+    func.showImgs(imgs, windowSizeMult=windowSizeMult)
 
 # START
 slidersWindowWrapper(functionsTesting, "grapes/grape3.jpeg")
+# slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")

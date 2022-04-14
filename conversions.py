@@ -151,23 +151,22 @@ def cfCann(img, thresh1, thresh2, dialateSize, blurSize):
 
 # USING CONTOURS FUNCTION
 
-def findContours(img, a):
+def findContours(img, lowrThrsh = 50):
     img2 = img.copy()
     # converting image into grayscale image
     gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
     # setting threshold of gray image
-    _, threshold = cv2.threshold(gray, a, 255, cv2.THRESH_BINARY)
+    _, threshold = cv2.threshold(gray, lowrThrsh, 255, cv2.THRESH_BINARY)
 
     # using a findContours() function
     contours, _ = cv2.findContours(
-        threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
+        threshold,
+        cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+    )
     i = 0
-
     # list for storing names of shapes
     for contour in contours:
-
         # here we are ignoring first counter because
         # findcontour function detects whole image as shape
         if i == 0:
@@ -177,9 +176,9 @@ def findContours(img, a):
         # cv2.approxPloyDP() function to approximate the shape
         approx = cv2.approxPolyDP(
             contour, 0.01 * cv2.arcLength(contour, True), True)
-
+        # hull = cv2.convexHull(contour)
         # using drawContours() function
-        cv2.drawContours(img2, [contour], 0, (0, 0, 255), 5)
+        cv2.drawContours(img2, [contour], 0, (0, 0, 255), 1)
 
         # # finding center point of shape
         # M = cv2.moments(contour)

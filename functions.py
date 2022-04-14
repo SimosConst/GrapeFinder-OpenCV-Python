@@ -38,21 +38,23 @@ def showImgs(imgs, windowSizeMult=2):
             cv2.destroyWindow("Image" + str(i))
 
 
-# NOT GOOD
-def showim(img):
-    cv2.namedWindow("Window_1", cv2.WINDOW_NORMAL)
-    cv2.createTrackbar("Trackbar_1", "Window_1", 0, 255, nothing)
+# SINGLE IMG SHOW
+def showImg(img,windowName="Window_1", windowSizeMult=2):
+    # RESIZE IMAGE
+    img = resizeImg(img, windowSizeMult)
+    # SHOW IMAGE
+    cv2.imshow(windowName, img)
 
-    while (cv2.waitKey(1) & 0xFF) != 27:
-        # THRESSHOLD CALCULATION
-        thresshold = cv2.getTrackbarPos("Trackbar_1", "Window_1") / (100 * 8)
-        # print(thresshold)
+#NOT FOR EVERY FUNCTION
+def calcImgs(imgs,function, *args):
+    for i in range(0, len(imgs)):
+        img = imgs[i]
+        imgs[i] = function(img, *args)
+    # for img in imgs:
+    #     img = function(img, *args)
 
-        # SHOW IMAGE
-        cv2.imshow("Window_1", img)
-
-    cv2.destroyAllWindows()
-
+#
+# def calcImgs
 
 # --------------------------
 # IMAGE RESIZE
