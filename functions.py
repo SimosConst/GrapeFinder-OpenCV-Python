@@ -38,20 +38,37 @@ def showImgs(imgs, windowSizeMult=2):
             cv2.destroyWindow("Image" + str(i))
 
 
+def calcPipeAndShowImgs(imgs, func, windowSizeMult=2):
+    # time.sleep(.5)
+    for i in range(len(imgs)):
+        img = imgs[i]
+        img = func(img)
+        img = resizeImg(img, windowSizeMult)
+        cv2.imshow("Image" + str(i), img)
+
+    for i in range(len(imgs), 10):
+        # Find if Window exists to close it
+        cond = cv2.getWindowProperty("Image" + str(i), cv2.WND_PROP_VISIBLE)
+        if (cond):
+            cv2.destroyWindow("Image" + str(i))
+
+
 # SINGLE IMG SHOW
-def showImg(img,windowName="Window_1", windowSizeMult=2):
+def showImg(img, windowSizeMult=2, windowName="Window_1"):
     # RESIZE IMAGE
     img = resizeImg(img, windowSizeMult)
     # SHOW IMAGE
     cv2.imshow(windowName, img)
 
-#NOT FOR EVERY FUNCTION
-def calcImgs(imgs,function, *args):
+
+# NOT FOR EVERY FUNCTION
+def calcImgs(imgs, function, *args):
     for i in range(0, len(imgs)):
         img = imgs[i]
         imgs[i] = function(img, *args)
     # for img in imgs:
     #     img = function(img, *args)
+
 
 #
 # def calcImgs
@@ -67,6 +84,23 @@ def resizeImg(img, multiplyer):
     img2 = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
 
     return img2
+
+
+def getResizePrcntAccToScreen(img, scrnSz):
+    imgH, imgW, _ = img.shape
+    scrW, scrH = scrnSz
+    imgDim = 0
+    scrDim = 0
+
+    isPortrait = imgH > imgW
+    imgDim = imgH if isPortrait else imgW
+    szCoef = 0.5 if isPortrait else 0.35
+    scrDim = scrH if isPortrait else scrW
+
+    reszPrcnt = imgDim / (scrDim * szCoef)
+    reszPrcnt = 1 / reszPrcnt
+
+    return reszPrcnt
 
 
 # --------------------------

@@ -37,19 +37,20 @@ class slidersWindow:
         cv2.namedWindow(self.windowName, cv2.WINDOW_NORMAL)
 
         # create trackbars for color change
-        self.trackbrsInitVals.append(["A_ColMag", 5, 80])
-        self.trackbrsInitVals.append(["B_CanPar1", 100, 400])
-        self.trackbrsInitVals.append(["B_CanPar2", 32, 200])
-        self.trackbrsInitVals.append(["B_MinRad", 1, 50])
-        self.trackbrsInitVals.append(["B_MaxRad", 20, 50])
+        # self.trackbrsInitVals.append(["A_ColMag", 5, 80])
+        # self.trackbrsInitVals.append(["B_CanPar1", 100, 400])
+        # self.trackbrsInitVals.append(["B_CanPar2", 32, 200])
+        # self.trackbrsInitVals.append(["B_MinRad", 1, 50])
+        # self.trackbrsInitVals.append(["B_MaxRad", 20, 50])
+        #
+        # self.trackbrsInitVals.append(["CannThresh2", 300, 400])
+        # self.trackbrsInitVals.append(["DialateSz", 2, 200])
+        # self.trackbrsInitVals.append(["BlurSz", 5, 100])
+        # self.trackbrsInitVals.append(["SobelKSize", 1, 310])
 
-        self.trackbrsInitVals.append(["CannThresh2", 300, 400])
-        self.trackbrsInitVals.append(["DialateSz", 2, 200])
-        self.trackbrsInitVals.append(["BlurSz", 5, 100])
-        self.trackbrsInitVals.append(["SobelKSize", 1, 310])
-
-        self.trackbrsInitVals.append(["ThrshLow", 1, 310])
-        self.trackbrsInitVals.append(["ThrshHigh", 1, 310])
+        self.trackbrsInitVals.append(["HueIsol_ColMargin", 10, 310])
+        self.trackbrsInitVals.append(["ThrshLow", 116, 310])
+        self.trackbrsInitVals.append(["DialtSz", 2, 310])
         self.initTrackbars()
         self.sliderNames = [sublist[0] for sublist in self.trackbrsInitVals]
         # cv2.createTrackbar(self.sliderNames[0], self.name, 5, 80, self.nothing)
@@ -88,7 +89,7 @@ class slidersWindow:
     #         valuesRange,
     #         self.nothing
     #     )
-    
+
     # def removeAllTrackbars(self):
     #     cv2.destroyWindow(self.windowName);
     #     cv2.namedWindow(self.windowName, cv2.WINDOW_NORMAL);
@@ -105,7 +106,7 @@ class slidersWindow:
             values.append(value)
         return values
 
-    #GET SLIDER VALUE BY REQUESTED NAME
+    # GET SLIDER VALUE BY REQUESTED NAME
     def getSldValByName(self, reqName):
         for name in self.sliderNames:
             if reqName == name:

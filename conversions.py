@@ -53,15 +53,10 @@ def filter2d(img, kernel):
 # CONTOURS
 # --------------------------------
 
-def cannyConv(img, a, b):
-    img2 = cv2.Canny(img, a, b)
-
-    return img2
-
 
 def cannyMask(img, thresh1, thresh2, dialateSize):
     # GET CONTOURS
-    img2 = cannyConv(img, thresh1, thresh2)
+    img2 = cv2.Canny(img, thresh1, thresh2)
     # Enlarge Contours
     # img2  = cv2.dilate(img2,np.ones((5, 5), np.uint8))
     # BACK TO RGB FOR THE MASKING
@@ -141,7 +136,6 @@ def circle_finder(img, cannyParam1=10, cannyParam2=32, minRadius=1, maxRadius=25
 
 
 # FUNCTIONS ENSEMBLE
-
 def cfCann(img, thresh1, thresh2, dialateSize, blurSize):
     img2 = cannyMask(img, thresh1, thresh2, dialateSize)
     img2 = circle_finder(img2, blurSize)
@@ -149,9 +143,42 @@ def cfCann(img, thresh1, thresh2, dialateSize, blurSize):
     return img2
 
 
-# USING CONTOURS FUNCTION
+# SAME AS FIND CONTOURS BUT THIS RETURNS AN OVERLAY
+def contoursOvrlay(img, lowrThrsh, minContArea=0):
+    # converting image into grayscale image
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-def findContours(img, lowrThrsh = 50):
+    # setting threshold of gray image
+    _, threshold = cv2.threshold(gray, lowrThrsh, 255, cv2.THRESH_BINARY)
+
+    # using a findContours() function
+    contours, _ = cv2.findContours(
+        threshold,
+        cv2.RETR_TREE,
+        cv2.CHAIN_APPROX_SIMPLE
+    )
+    i = 0
+    # GET A BLACK IMAGE WITH THE SAME DIMENTIONS
+    bimg = np.zeros(img.shape, np.uint8)
+
+    # list for storing names of shapes
+    for contour in contours:
+        # here we are ignoring first counter because
+        # findcontour function detects whole image as shape
+        if i == 0:
+            i = 1
+            continue
+        if cv2.contourArea(contour) > minContArea:
+            cv2.drawContours(bimg, [contour], 0, 3 * [255]
+                             , 1
+                             # ,cv2.FILLED
+                             )
+
+    return bimg
+
+
+# USING CONTOURS FUNCTION
+def findContours(img, lowrThrsh=50):
     img2 = img.copy()
     # converting image into grayscale image
     gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -162,9 +189,11 @@ def findContours(img, lowrThrsh = 50):
     # using a findContours() function
     contours, _ = cv2.findContours(
         threshold,
-        cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+        cv2.RETR_TREE,
+        cv2.CHAIN_APPROX_SIMPLE
     )
     i = 0
+
     # list for storing names of shapes
     for contour in contours:
         # here we are ignoring first counter because
@@ -174,11 +203,11 @@ def findContours(img, lowrThrsh = 50):
             continue
 
         # cv2.approxPloyDP() function to approximate the shape
-        approx = cv2.approxPolyDP(
-            contour, 0.01 * cv2.arcLength(contour, True), True)
+        # approx = cv2.approxPolyDP(
+        #     contour, 0.01 * cv2.arcLength(contour, True), True)
         # hull = cv2.convexHull(contour)
         # using drawContours() function
-        cv2.drawContours(img2, [contour], 0, (0, 0, 255), 1)
+        cv2.drawContours(img2, [contour], 0, (100, 100, 255), 3)
 
         # # finding center point of shape
         # M = cv2.moments(contour)
@@ -216,15 +245,22 @@ def findContours(img, lowrThrsh = 50):
 # COLOR ISOLATION
 # --------------------------------
 
-def isolateColor(img, lowerbound, upperbound, medBlurAmount):
+def isolateColorWithVectors(img, lowerbound, upperbound, medBlurAmount):
     # img2 = img.copy()
     img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(img2, lowerbound, upperbound)
     mask_rgb = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     img2 = cv2.bitwise_and(img2, mask_rgb)
 
-    # img2 = cv2.medianBlur(img2, ksize=medBlurAmount)
+    img2 = cv2.medianBlur(img2, ksize=medBlurAmount)
     img2 = cv2.cvtColor(img2, cv2.COLOR_HSV2BGR)
+    return img2
+
+
+def isolateHue(img, lowerbound, upperbound, medBlurAmount=0):
+    lBoundArr = np.array([lowerbound, 0, 0])
+    hBoundArr = np.array([upperbound, 255, 255])
+    img2 = isolateColorWithVectors(img, lBoundArr, hBoundArr, medBlurAmount)
     return img2
 
 
@@ -304,7 +340,7 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
         lowerbound = np.array([hue255 - margin, 0, 0], dtype=np.uint8)
         upperbound = np.array([hue255 + margin, 255, 255], dtype=np.uint8)
 
-        img2 = isolateColor(img, lowerbound, upperbound, 1)
+        img2 = isolateColorWithVectors(img, lowerbound, upperbound, 1)
         # img2 = cv2.medianBlur(img2, 3)
         # SHOW ONLY PICTURES WITH BLACK PERCENT LOWER THAN 5%
         gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -327,6 +363,18 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
             count += 1
     return imgs
 
+# QUANTIZE THE VALUE OF THE HSV VECTOR WITH MODULO SUBDIVISIONS
+def quantinizeHSValue(img, divisions = 12):
+    n = divisions
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    img = cv2.medianBlur(img, 3)
+    img[:, :, 2] = np.array(np.floor_divide(img[:, :, 2], n) * (n), np.uint8)
+    img = cv2.medianBlur(img, 5)
+
+    img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
+
+    return img
 
 def approach1(img, colMarg=15, canPar1=10, canPar2=32, minRad=1, maxRad=25):
     imgs = getIsolColImgs(img, colorMargin=colMarg)
