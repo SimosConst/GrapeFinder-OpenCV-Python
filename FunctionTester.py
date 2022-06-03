@@ -127,35 +127,22 @@ def testing2(img, slidersWindowObject, windowSizeMult):
 
 def testing3(img, slidersWindowObject, windowSizeMult):
     w = slidersWindowObject
-    v = w.getSldValuesByNames(["HueIsol_ColMargin", "ThrshLow", "DialtSz"])
+    v = w.getSldValuesByNames([
+        "HueIsol_ColMargin",
+        "ThrshLow",
+        "DialtSz",
+        "Chanel"
+    ])
     n = v[0] * 2
 
+    img1 = conv.quantinizeRGBChannel(img, n, v[3])
     img2 = conv.quantinizeHSValue(img, n)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # img = cv2.medianBlur(img, 3)
-    img = np.array(np.floor_divide(img, n) * (n), np.uint8)
-    img = cv2.medianBlur(img, 5)
+    img3 = conv.quantinizeGray(img, n)
 
-    # f = np.fft.fft2(img)
-    # fshift = np.fft.fftshift(f)
-    # magnitude_spectrum = 120 * np.log(np.abs(fshift))
-    # magnitude_spectrum = np.asarray(magnitude_spectrum, dtype=np.uint8)
-    #
-    # f_ishift = np.fft.ifftshift(np.float32(fshift))
-    # img_back = cv2.idft(f_ishift)
-    # img_back = cv2.magnitude(img_back,img_back)
-    #
-    # img_and_magnitude = np.concatenate(
-    #     (img, magnitude_spectrum, img_back), axis=1)
-    #
-    # img = img_and_magnitude
-
-    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-    imgs = [img, img2]
+    imgs = [img1, img2 ,img3]
     func.showImgs(imgs, windowSizeMult=windowSizeMult)
 
 
 # START
-slidersWindowWrapper(testing3, "grapes/grape4.jpeg")
+slidersWindowWrapper(testing3, "grapes/grape3.jpeg")
 # slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")

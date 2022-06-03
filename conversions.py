@@ -363,8 +363,9 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
             count += 1
     return imgs
 
+
 # QUANTIZE THE VALUE OF THE HSV VECTOR WITH MODULO SUBDIVISIONS
-def quantinizeHSValue(img, divisions = 12):
+def quantinizeHSValue(img, divisions=12):
     n = divisions
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -375,6 +376,34 @@ def quantinizeHSValue(img, divisions = 12):
     img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
 
     return img
+
+
+def quantinizeRGBChannel(img, divisions=12, channel=1):
+    n = divisions
+    if channel > 2:
+        channel = 2
+    elif channel < 0:
+        channel = 0
+
+    img = cv2.medianBlur(img, 3)
+    img = np.array(np.floor_divide(img[:,:,channel], n) * (n), np.uint8)
+    img = cv2.medianBlur(img, 5)
+
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    return img
+
+
+def quantinizeGray(img, divisions=12):
+    n = divisions
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.medianBlur(img, 3)
+    img = np.array(np.floor_divide(img, n) * n, np.uint8)
+    img = cv2.medianBlur(img, 5)
+
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    return img
+
 
 def approach1(img, colMarg=15, canPar1=10, canPar2=32, minRad=1, maxRad=25):
     imgs = getIsolColImgs(img, colorMargin=colMarg)

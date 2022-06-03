@@ -51,6 +51,7 @@ class slidersWindow:
         self.trackbrsInitVals.append(["HueIsol_ColMargin", 10, 310])
         self.trackbrsInitVals.append(["ThrshLow", 116, 310])
         self.trackbrsInitVals.append(["DialtSz", 2, 310])
+        self.trackbrsInitVals.append(["Chanel", 0, 2])
         self.initTrackbars()
         self.sliderNames = [sublist[0] for sublist in self.trackbrsInitVals]
         # cv2.createTrackbar(self.sliderNames[0], self.name, 5, 80, self.nothing)
