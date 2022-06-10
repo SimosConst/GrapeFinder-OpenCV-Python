@@ -4,11 +4,16 @@ from builtins import len
 import cv2
 import numpy as np
 import time
+
+import conversions
 import functions as func
 from collections import Counter as ct
 
 
 def sobelViewer(img, kernel_size):
+    kernel_size = 1 if (kernel_size <= 0) else kernel_size
+    kernel_size = kernel_size + 1 if ((kernel_size % 2) == 0) else kernel_size
+    kernel_size = 31 if (kernel_size > 31) else kernel_size
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
@@ -20,6 +25,32 @@ def sobelViewer(img, kernel_size):
     grad = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
 
     return [abs_grad_x, abs_grad_y, grad]
+
+
+# --------------------------------
+# MORPHOLOGICAL OPERATIONS
+# --------------------------------
+
+def morphOps(img, kSize=3, kShape=0, method=0):
+    kSize = 1 if kSize == 0 else kSize
+
+    # MORPH_RECT = 0
+    # MORPH_CROSS = 1
+    # MORPH_ELLIPSE = 2
+    # shapes = [cv2.MORPH_ELLIPSE, cv2.MORPH_RECT, cv2.MORPH_CROSS]
+
+    # MORPH_ERODE = 0   MORPH_GRADIENT = 4
+    # MORPH_DILATE = 1  MORPH_TOPHAT = 5
+    # MORPH_OPEN = 2    MORPH_HITMISS = 7
+    # MORPH_CLOSE = 3   MORPH_BLACKHAT = 6
+    # methods = [
+    #     cv2.MORPH_OPEN, cv2.MORPH_CLOSE,
+    #     cv2.MORPH_DILATE, cv2.MORPH_ERODE,
+    #     cv2.MORPH_GRADIENT, cv2.MORPH_TOPHAT, cv2.MORPH_BLACKHAT]
+
+    kernel = cv2.getStructuringElement(kShape, 2 * [kSize])
+    opening = cv2.morphologyEx(img, method, kernel)
+    return opening
 
 
 # --------------------------------
@@ -149,7 +180,8 @@ def contoursOvrlay(img, lowrThrsh, minContArea=0):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # setting threshold of gray image
-    _, threshold = cv2.threshold(gray, lowrThrsh, 255, cv2.THRESH_BINARY)
+    # _, threshold = cv2.threshold(gray, lowrThrsh, 255, cv2.THRESH_BINARY)
+    threshold = cv2.Canny(gray, lowrThrsh, 10)
 
     # using a findContours() function
     contours, _ = cv2.findContours(
@@ -161,6 +193,7 @@ def contoursOvrlay(img, lowrThrsh, minContArea=0):
     # GET A BLACK IMAGE WITH THE SAME DIMENTIONS
     bimg = np.zeros(img.shape, np.uint8)
 
+    contour_list = []
     # list for storing names of shapes
     for contour in contours:
         # here we are ignoring first counter because
@@ -168,12 +201,21 @@ def contoursOvrlay(img, lowrThrsh, minContArea=0):
         if i == 0:
             i = 1
             continue
-        if cv2.contourArea(contour) > minContArea:
+
+        approx = cv2.approxPolyDP(contour, .001 * cv2.arcLength(contour, 1), 1)
+        area = cv2.contourArea(contour)
+
+        # print(approx)
+        inLengthRange = lambda: (len(approx) > 10) & (len(approx) < 100)
+        inAreaRange = lambda: area > 50
+
+        if inLengthRange() & inAreaRange():
+            # if inAreaRange():
+            # contour_list.append(contour)
             cv2.drawContours(bimg, [contour], 0, 3 * [255]
                              , 1
                              # ,cv2.FILLED
                              )
-
     return bimg
 
 
@@ -217,27 +259,6 @@ def findContours(img, lowrThrsh=50):
         #     x = int(M['m10'] / M['m00'])
         #     y = int(M['m01'] / M['m00'])
 
-        # # putting shape name at center of each shape
-        # if len(approx) == 3:
-        #     cv2.putText(img2, 'Triangle', (x, y),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        #
-        # elif len(approx) == 4:
-        #     cv2.putText(img2, 'Quadrilateral', (x, y),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        #
-        # elif len(approx) == 5:
-        #     cv2.putText(img2, 'Pentagon', (x, y),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        #
-        # elif len(approx) == 6:
-        #     cv2.putText(img2, 'Hexagon', (x, y),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-        #
-        # else:
-        #     cv2.putText(img2, 'circle', (x, y),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-
     return img2
 
 
@@ -245,14 +266,14 @@ def findContours(img, lowrThrsh=50):
 # COLOR ISOLATION
 # --------------------------------
 
-def isolateColorWithVectors(img, lowerbound, upperbound, medBlurAmount):
+def isolateColorWithVectors(img, lowerbound, upperbound, medBlur=False, medBlurAmount=3):
     # img2 = img.copy()
     img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(img2, lowerbound, upperbound)
     mask_rgb = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     img2 = cv2.bitwise_and(img2, mask_rgb)
 
-    img2 = cv2.medianBlur(img2, ksize=medBlurAmount)
+    if medBlur: img2 = cv2.medianBlur(img2, ksize=medBlurAmount)
     img2 = cv2.cvtColor(img2, cv2.COLOR_HSV2BGR)
     return img2
 
@@ -260,7 +281,7 @@ def isolateColorWithVectors(img, lowerbound, upperbound, medBlurAmount):
 def isolateHue(img, lowerbound, upperbound, medBlurAmount=0):
     lBoundArr = np.array([lowerbound, 0, 0])
     hBoundArr = np.array([upperbound, 255, 255])
-    img2 = isolateColorWithVectors(img, lBoundArr, hBoundArr, medBlurAmount)
+    img2 = isolateColorWithVectors(img, lBoundArr, hBoundArr, medBlurAmount=medBlurAmount)
     return img2
 
 
@@ -311,7 +332,7 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
     # SOTRING
     srtd = sorted(range(len(histHue)), reverse=True, key=lambda k: histHue[k])
     max31 = []
-    step = quantinizeStep
+    step = quantinizeStep / 2
     max31.append(srtd[1])
     # print(srtd)
     # FIND MAX BETWEEN RANGES
@@ -335,12 +356,12 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
     for color in max31:
 
         hue255 = color
-        margin = colorMargin
+        margin = colorMargin/2
 
         lowerbound = np.array([hue255 - margin, 0, 0], dtype=np.uint8)
         upperbound = np.array([hue255 + margin, 255, 255], dtype=np.uint8)
 
-        img2 = isolateColorWithVectors(img, lowerbound, upperbound, 1)
+        img2 = isolateColorWithVectors(img, lowerbound, upperbound, medBlur=False)
         # img2 = cv2.medianBlur(img2, 3)
         # SHOW ONLY PICTURES WITH BLACK PERCENT LOWER THAN 5%
         gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
@@ -351,7 +372,7 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
         cond1 = True
         cond1 = blackPrct >= 4
 
-        if (cond1):
+        if cond1:
             # Find if Window exists to close it
             # cond = cv2.getWindowProperty("img" + str(count), cv2.WND_PROP_VISIBLE)
             # if(cond):
@@ -365,14 +386,23 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
 
 
 # QUANTIZE THE VALUE OF THE HSV VECTOR WITH MODULO SUBDIVISIONS
-def quantinizeHSValue(img, divisions=12):
-    n = divisions
+def quantinizeHSValue(img, divisions=12, preBlur=1, postBlur=1):
+    # VALUE LIMITER
+    n = divisions if divisions > 0 else 1
+
+    # GET HSV
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    img = cv2.medianBlur(img, 3)
-    img[:, :, 2] = np.array(np.floor_divide(img[:, :, 2], n) * (n), np.uint8)
-    img = cv2.medianBlur(img, 5)
+    # FIRST BLURING
+    if preBlur:
+        img = cv2.medianBlur(img, 3)
 
+    # QUANTIZATION
+    img[:, :, 2] = np.array(np.floor_divide(img[:, :, 2], n) * (n), np.uint8)
+
+    # PostBlur
+    if postBlur:
+        img = cv2.medianBlur(img, 5)
     img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
 
     return img
@@ -386,7 +416,7 @@ def quantinizeRGBChannel(img, divisions=12, channel=1):
         channel = 0
 
     img = cv2.medianBlur(img, 3)
-    img = np.array(np.floor_divide(img[:,:,channel], n) * (n), np.uint8)
+    img = np.array(np.floor_divide(img[:, :, channel], n) * (n), np.uint8)
     img = cv2.medianBlur(img, 5)
 
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)

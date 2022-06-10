@@ -1,6 +1,6 @@
 import colorsys
 import time
-
+import ctypes
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
@@ -86,19 +86,25 @@ def resizeImg(img, multiplyer):
     return img2
 
 
-def getResizePrcntAccToScreen(img, scrnSz):
-    imgH, imgW, _ = img.shape
-    scrW, scrH = scrnSz
-    imgDim = 0
-    scrDim = 0
+def getResizePrcntAccToScreen(img):
+    # GET SCREEN SIZE
+    user32 = ctypes.windll.user32
+    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 
-    isPortrait = imgH > imgW
+    imgH, imgW, _ = img.shape
+    scrW, scrH = screensize
+
+    # isPortrait = imgH > imgW
+    isPortrait = 1  # Override
     imgDim = imgH if isPortrait else imgW
-    szCoef = 0.5 if isPortrait else 0.35
+    szCoef = 2.5 if isPortrait else 4
     scrDim = scrH if isPortrait else scrW
 
-    reszPrcnt = imgDim / (scrDim * szCoef)
-    reszPrcnt = 1 / reszPrcnt
+    # reszPrcnt = imgDim / (scrDim * szCoef)
+    # reszPrcnt = imgDim / scrDim + 1
+    reszPrcnt = scrDim / (imgDim * szCoef)
+
+    # reszPrcnt = 1 / reszPrcnt
 
     return reszPrcnt
 

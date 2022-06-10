@@ -5,22 +5,16 @@ import numpy as np
 import functions as func
 import slidersWindow as sldWin
 import conversions as conv
-import ctypes
 
-# GET SCREEN SIZE
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 # IMAGE MULTIPLYER
 windowSizeMult = 2.5
 
 
 # WRAPPER FUNCTION TO DISPLAY FILTERS FOR EVERY SLIDER CHANGE
-
-
 def slidersWindowWrapper(function, image_path):
     # LOAD IMAGE
     img = cv2.imread(image_path)
-    windowSizeMult = func.getResizePrcntAccToScreen(img, scrnSz=screensize)
+    windowSizeMult = func.getResizePrcntAccToScreen(img)
 
     # INITIAL IMAGE FRAME
     # cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
@@ -127,22 +121,83 @@ def testing2(img, slidersWindowObject, windowSizeMult):
 
 def testing3(img, slidersWindowObject, windowSizeMult):
     w = slidersWindowObject
-    v = w.getSldValuesByNames([
+    v = w.getSldValsByNamesToDict([
         "HueIsol_ColMargin",
         "ThrshLow",
-        "DialtSz",
-        "Chanel"
+        "DialtSz"
     ])
-    n = v[0] * 2
+    # img = cv2.medianBlur(img, 5)
+    # img = cv2.blur(img,np.array([3, 3]))
+    # # img = conv.quantinizeHSValue(img, 16)
+    # img2 = conv.contoursOvrlay(img, v["ThrshLow"], v["DialtSz"])
+    # img2 = cv2.dilate(img2, np.array([5, 5]))
+    # img2 = cv2.bitwise_or(img, img2)
 
-    img1 = conv.quantinizeRGBChannel(img, n, v[3])
-    img2 = conv.quantinizeHSValue(img, n)
-    img3 = conv.quantinizeGray(img, n)
-
-    imgs = [img1, img2 ,img3]
+    imgs = [
+        # conv.quantinizeRGBChannel(img, v["NoOfDivs"], v["Chanel"]),
+        # img2,
+        conv.quantinizeGray(img, v["DialtSz"])
+    ]
     func.showImgs(imgs, windowSizeMult=windowSizeMult)
 
 
+def testing4(img, slidersWindowObject, windowSizeMult):
+    v = slidersWindowObject.getSldValsByNamesToDict([
+        "HI_ColMargin",
+        "HI_QuantStep",
+        "E_ThrshLow",
+        "Q_NoOfDivs"
+    ])
+    img = conv.quantinizeHSValue(img, v["Q_NoOfDivs"], preBlur=1, postBlur=1)
+    imgs = conv.getIsolColImgs(
+        img,
+        quantinizeStep=v["HI_QuantStep"],
+        colorMargin=v["HI_ColMargin"]
+    )
+
+    func.showImgs(imgs, windowSizeMult)
+
+    def pipe1(img):
+        # img2 = conv.contoursOvrlay(img, v["E_ThrshLow"])
+        _, _, img2 = conv.sobelViewer(img, v["E_ThrshLow"])
+
+        # out_img = cv2.subtract(img, opening)
+        # out_img = cv2.bitwise_and(img2, img)
+        # return out_img
+
+        return img2
+
+    def pipe3(img):
+        return img
+
+    func.calcPipeAndShowImgs(imgs, pipe1, windowSizeMult)
+
+
+def testing5(img, slidersWindowObject, windowSizeMult):
+    v = slidersWindowObject.getAllSldValsToDict()
+
+    img2 = conv.morphOps(
+        img,
+        kSize=v["M_kSize"],
+        kShape=v["M_kShape"],
+        method=v["M_method"]
+    )
+    imgs = conv.getIsolColImgs(
+        img2,
+        quantinizeStep=v["HI_QuantStep"],
+        colorMargin=v["HI_ColMargin"]
+    )
+    for i in range(len(imgs)):
+        imgs[i] = conv.morphOps(
+            imgs[i],
+            kSize=v["M_k2Size"],
+            kShape=cv2.MORPH_ELLIPSE,
+            method=cv2.MORPH_OPEN
+        )
+
+    func.showImgs(imgs, windowSizeMult)
+
+
 # START
-slidersWindowWrapper(testing3, "grapes/grape3.jpeg")
+slidersWindowWrapper(testing5, "grapes/grape5.jpeg")
 # slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")
