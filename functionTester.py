@@ -198,6 +198,24 @@ def testing5(img, slidersWindowObject, windowSizeMult):
     func.showImgs(imgs, windowSizeMult)
 
 
+def testing6(img, slidersWindowObject, windowSizeMult):
+    v = slidersWindowObject.getAllSldValsToDict()
+
+    simplLapl = np.array([
+        [1, 1, 1],
+        [1, -8, 1],
+        [1, 1, 1]
+    ])
+
+    lapl = np.array([
+        [0, 1, 0],
+        [1, -4, 1],
+        [0, 1, 0]
+    ])
+    imgOut = conv.filter2d(img, lapl)
+    func.showImg(imgOut, windowSizeMult)
+
+
 # START
-slidersWindowWrapper(testing5, "grapes/grape5.jpeg")
+slidersWindowWrapper(testing6, "grapes/grape5.jpeg")
 # slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")
