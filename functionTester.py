@@ -7,7 +7,6 @@ import slidersWindow as sldWin
 import conversions as conv
 
 # IMAGE MULTIPLYER
-
 windowSizeMult = 2.5
 
 
