@@ -182,18 +182,30 @@ def testing5(img, slidersWindowObject, windowSizeMult):
         kShape=v["M_kShape"],
         method=v["M_method"]
     )
+
+    medKSz = v["M_k2Size"] if v["M_k2Size"] % 2 == 1 else v["M_k2Size"] + 1
+    img2 = cv2.medianBlur(img2, medKSz)
+    # imgs = conv.approach1(
+    #     img2,
+    #     # quantinizeStep=v["HI_QuantStep"],
+    #     colMarg=v["HI_ColMargin"]
+    # )
     imgs = conv.getIsolColImgs(
         img2,
         quantinizeStep=v["HI_QuantStep"],
         colorMargin=v["HI_ColMargin"]
     )
-    for i in range(len(imgs)):
-        imgs[i] = conv.morphOps(
-            imgs[i],
-            kSize=v["M_k2Size"],
-            kShape=cv2.MORPH_ELLIPSE,
-            method=cv2.MORPH_OPEN
-        )
+    # for i in range(len(imgs)):
+    #     tmpImg = conv.morphOps(
+    #         imgs[i],
+    #         kSize=v["M_k2Size"],
+    #         kShape=cv2.MORPH_ELLIPSE,
+    #         method=cv2.MORPH_OPEN
+    #     )
+    # grayImage = cv2.cvtColor(tmpImg, cv2.COLOR_BGR2GRAY)
+    # _, blackAndWhiteImage = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)
+    # bw = cv2.cvtColor(blackAndWhiteImage, cv2.COLOR_GRAY2RGB)
+    # imgs[i] = cv2.bitwise_xor(bw, img)
 
     func.showImgs(imgs, windowSizeMult)
 
@@ -212,10 +224,101 @@ def testing6(img, slidersWindowObject, windowSizeMult):
         [1, -4, 1],
         [0, 1, 0]
     ])
-    imgOut = conv.filter2d(img, lapl)
-    func.showImg(imgOut, windowSizeMult)
+    # imgOut = conv.filter2d(img, lapl)
+    imgArr = [conv.filter2d(img, simplLapl), conv.filter2d(img, lapl)]
+
+    # func.showImg(imgOut, windowSizeMult)
+    func.showImgs(imgArr, windowSizeMult)
+
+
+def testing7(img, slidersWindowObject, windowSizeMult):
+    v = slidersWindowObject.getAllSldValsToDict()
+    kernel_size = v["M_k2Size"]
+    kernel_size = kernel_size + 1 if ((kernel_size % 2) == 0) else kernel_size
+    img = cv2.medianBlur(img, kernel_size)
+    img2 = conv.morphOps(
+        img,
+        kSize=v["M_kSize"],
+        kShape=v["M_kShape"],
+        method=v["M_method"]
+    )
+    imgOut = conv.approach1(
+        img2,
+        v["A_ColMag"],
+        v["B_CanPar1"],
+        v["B_CanPar2"],
+        v["B_MinRad"],
+        v["B_MaxRad"]
+    )
+
+    func.showImgs(imgOut, windowSizeMult=windowSizeMult)
+
+
+def testing8(img, slidersWindowObject, windowSizeMult):
+    v = slidersWindowObject.getAllSldValsToDict()
+
+    img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    img2 = cv2.inRange(
+        img2,
+        np.array([v["R_LBound"], 0, 0]),
+        np.array([v["R_UBound"], 255, 255])
+    )
+    img2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR)
+    img = cv2.bitwise_and(img2, img)
+
+    img2 = conv.morphOps(
+        img,
+        kShape=v["M_kShape"],
+        kSize=v["M_kSize"],
+        method=v["M_method"]
+    )
+    #
+    # sign = 1 if (v["F_CPositivity"]) else -1
+    # center = sign * v["F_Center"]
+    #
+    # lapl = np.array([
+    #     [0, 1, 0],
+    #     [1, center, 1],
+    #     [0, 1, 0]
+    # ])
+    # img2 = conv.filter2d(img2, lapl)
+
+    gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+    contours, hierarchy = cv2.findContours(gray, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        # roi = img[y:y + h, x:x + w]
+        # cv2.imwrite(str(idx) + '.jpg', roi)
+        if (w * h > 2000):
+            cv2.rectangle(img2, (x, y), (x + w, y + h), (200, 100, 100), 2)
+            cv2.drawContours(img2, [cnt], -1, (100, 200, 150), 1)
+            hull = cv2.convexHull(cnt)
+
+            # maxY = np.max(hull[:, 0, 1])
+            # minY = np.min(hull[:, 0, 1])
+            # avgX = np.uint8(np.median(hull[:, 0, 0]))
+            # cv2.line(img2, (maxY, avgX), (minY, avgX), (200, 200, 200), 2)
+            midPoint = (x + np.uint8(w / 2))
+            margin = np.uint8(w / 16)
+            point1 = (midPoint - margin, y + 10)
+            point2 = (midPoint + margin, y - np.uint8(h / 5))
+
+            # point1 = (hull[np.where(hull[:, 0, 1] == y)[0][1], 0, 0], y)
+            # point2 = (hull[np.where(hull[:, 0, 1] == y + h -1)[0][1], 0, 0], y + h -1)
+
+            cv2.drawContours(img2, [hull], -1, (100, 100, 200), 2)
+            cv2.rectangle(img2, point1, point2, (100, 100, 120), -1)
+            cv2.putText(
+                img2, "Around: (" + str(midPoint) + "," + str(y) + ")",
+                point2, cv2.FONT_HERSHEY_SIMPLEX, .3, (200, 200, 220), 1
+            )
+
+    # func.showImgs([img2, cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)], windowSizeMult)
+    func.showImg(img2, windowSizeMult)
 
 
 # START
-slidersWindowWrapper(testing6, "grapes/grape5.jpeg")
+
+slidersWindowWrapper(testing8, "grapes/grape2.jpeg")
+
 # slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")
