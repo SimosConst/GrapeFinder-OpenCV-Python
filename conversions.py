@@ -3,9 +3,7 @@ from builtins import len
 
 import cv2
 import numpy as np
-import time
 
-import conversions
 import functions as func
 from collections import Counter as ct
 
@@ -435,8 +433,8 @@ def quantinizeGray(img, divisions=12):
     return img
 
 
-def approach1(img, colMarg=15, canPar1=10, canPar2=32, minRad=1, maxRad=25):
-    imgs = getIsolColImgs(img, colorMargin=colMarg)
+def approach1(img, colMarg=15, canPar1=10, canPar2=32, minRad=1, maxRad=25, quantinizeStep=32):
+    imgs = getIsolColImgs(img, colorMargin=colMarg, quantinizeStep=quantinizeStep)
     imgs2 = []
     for i in range(len(imgs)):
         img = imgs[i]

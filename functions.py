@@ -9,7 +9,6 @@ import numpy as np
 def nothing(x):
     pass
 
-
 # --------------------------
 # DISPLAY IMAGE
 # --------------------------

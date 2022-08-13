@@ -33,11 +33,11 @@ class slidersWindow:
         cv2.namedWindow(self.windowName, cv2.WINDOW_GUI_NORMAL)
 
         # create trackbars for color change
-        # self.trackbrsInitVals.append(["A_ColMag", 5, 80])
-        # self.trackbrsInitVals.append(["B_CanPar1", 100, 400])
-        # self.trackbrsInitVals.append(["B_CanPar2", 32, 200])
-        # self.trackbrsInitVals.append(["B_MinRad", 1, 50])
-        # self.trackbrsInitVals.append(["B_MaxRad", 20, 50])
+        self.trackbrsInitVals.append(["A_ColMag", 5, 80])
+        self.trackbrsInitVals.append(["B_CanPar1", 100, 400])
+        self.trackbrsInitVals.append(["B_CanPar2", 32, 200])
+        self.trackbrsInitVals.append(["B_MinRad", 1, 50])
+        self.trackbrsInitVals.append(["B_MaxRad", 20, 50])
 
         # self.trackbrsInitVals.append(["CannThresh2", 300, 400])
         # self.trackbrsInitVals.append(["DialateSz", 2, 200])
@@ -59,6 +59,14 @@ class slidersWindow:
         self.trackbrsInitVals.append(["M_kShape", 2, 2])
         self.trackbrsInitVals.append(["M_method", 2, 6])
         self.trackbrsInitVals.append(["M_k2Size", 6, 124])
+
+        # COLOR RANGE
+        self.trackbrsInitVals.append(["R_LBound", 0, 255])
+        self.trackbrsInitVals.append(["R_UBound", 255, 255])
+
+        # FILTER
+        self.trackbrsInitVals.append(["F_CPositivity", 0, 1])
+        self.trackbrsInitVals.append(["F_Center", 3, 150])
 
         self.initTrackbars()
         self.sliderNames = [sublist[0] for sublist in self.trackbrsInitVals]
