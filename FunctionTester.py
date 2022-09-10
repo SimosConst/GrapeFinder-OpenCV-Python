@@ -1,10 +1,8 @@
-import time
 import cv2
-import matplotlib
 import numpy as np
+import conversions as conv
 import functions as func
 import slidersWindow as sldWin
-import conversions as conv
 
 # IMAGE MULTIPLYER
 windowSizeMult = 2.5
