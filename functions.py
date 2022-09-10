@@ -1,27 +1,16 @@
 import colorsys
-import time
 import ctypes
 import cv2
-from matplotlib import pyplot as plt
 import numpy as np
 
 
 def nothing(x):
     pass
 
+
 # --------------------------
 # DISPLAY IMAGE
 # --------------------------
-
-def pltshow(img):
-    plt.figure()
-    plt.imshow(img), plt.title("Title1")
-
-
-def subpltshow(im1, im2):
-    plt.figure()
-    # plt.subplot(, plt.title("Title1")
-
 
 def showImgs(imgs, windowSizeMult=2):
     # time.sleep(.5)

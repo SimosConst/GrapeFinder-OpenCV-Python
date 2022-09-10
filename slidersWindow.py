@@ -50,7 +50,7 @@ class slidersWindow:
         self.trackbrsInitVals.append(["E_ThrshLow", 11, 310])
         # self.trackbrsInitVals.append(["DialtSz", 2, 310])
 
-        #ColorQuantize
+        # ColorQuantize
         self.trackbrsInitVals.append(["Q_NoOfDivs", 1, 124])
         # self.trackbrsInitVals.append(["Chanel", 0, 2])
 

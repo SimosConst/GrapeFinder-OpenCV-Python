@@ -1,11 +1,9 @@
 import math
 from builtins import len
+from collections import Counter as ct
 
 import cv2
 import numpy as np
-
-import functions as func
-from collections import Counter as ct
 
 
 def sobelViewer(img, kernel_size):
@@ -354,7 +352,7 @@ def getIsolColImgs(img, quantinizeStep=32, colorMargin=10):
     for color in max31:
 
         hue255 = color
-        margin = colorMargin/2
+        margin = colorMargin / 2
 
         lowerbound = np.array([hue255 - margin, 0, 0], dtype=np.uint8)
         upperbound = np.array([hue255 + margin, 255, 255], dtype=np.uint8)
