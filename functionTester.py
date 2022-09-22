@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+
 import conversions as conv
 import functions as func
 import slidersWindow as sldWin
@@ -8,14 +9,13 @@ import slidersWindow as sldWin
 windowSizeMult = 2.5
 
 
-# WRAPPER FUNCTION TO DISPLAY FILTERS FOR EVERY SLIDER CHANGE
+# Wrapper Function To Excecute functions for an image perpetualy
 def slidersWindowWrapper(function, image_path):
     # LOAD IMAGE
     img = cv2.imread(image_path)
     windowSizeMult = func.getResizePrcntAccToScreen(img)
 
-    # INITIAL IMAGE FRAME
-    # cv2.imshow('arxikh', func.resizeImg(img, windowSizeMult))
+    #INITIAL IMAGE FRAME
     func.showImg(img, windowSizeMult=windowSizeMult, windowName="arxikh")
 
     # CREATE SLIDERSWINDOW OBJECT
@@ -314,9 +314,7 @@ def testing8(img, slidersWindowObject, windowSizeMult):
     # func.showImgs([img2, cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)], windowSizeMult)
     func.showImg(img2, windowSizeMult)
 
-
 # START
 
 slidersWindowWrapper(testing8, "grapes/grape2.jpeg")
-
 # slidersWindowWrapper(simpleTesting, "grapes/grape4.jpeg")
