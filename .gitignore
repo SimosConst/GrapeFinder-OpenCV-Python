@@ -9,3 +9,5 @@ __pycache__/functionTester.cpython-310.pyc
 *.pyc
 *.pyc
 out_code.txt
+/docs/
+/doc/
